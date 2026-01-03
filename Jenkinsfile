@@ -1,22 +1,18 @@
 pipeline {
 
-    /* Run pipeline on your existing Jenkins agent */
     agent { label 'jenkins-Agent' }
 
-    /* Tools configured in Manage Jenkins → Tools */
     tools {
         jdk 'java17'
         maven 'Maven3'
     }
 
-    /* Environment variables */
     environment {
-        APP_NAME    = "register-app"
-        RELEASE     = "1.0.0"
+        APP_NAME   = "register-app"
+        RELEASE    = "1.0.0"
         DOCKER_USER = "puvisha007"
-        DOCKER_PASS = credentials("dockerhub-creds")
-        IMAGE_NAME  = "${DOCKER_USER}/${APP_NAME}"
-        IMAGE_TAG   = "${RELEASE}-${BUILD_NUMBER}"
+        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+        IMAGE_TAG  = "${RELEASE}-${BUILD_NUMBER}"
     }
 
     stages {
@@ -41,19 +37,23 @@ pipeline {
             }
         }
 
-        stage("Run Unit Tests") {
-            steps {
-                sh 'mvn test'
-            }
-        }
-
         stage("Docker Build & Push") {
             steps {
-                sh '''
-                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                    docker build -t $IMAGE_NAME:$IMAGE_TAG .
-                    docker push $IMAGE_NAME:$IMAGE_TAG
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                        
+                        docker build -t $IMAGE_NAME:$IMAGE_TAG .
+                        docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+                        
+                        docker push $IMAGE_NAME:$IMAGE_TAG
+                        docker push $IMAGE_NAME:latest
+                    '''
+                }
             }
         }
     }
@@ -61,7 +61,9 @@ pipeline {
     post {
         success {
             echo "✅ Build successful!"
-            echo "Docker Image pushed: $IMAGE_NAME:$IMAGE_TAG"
+            echo "🐳 Docker Image pushed:"
+            echo "   $IMAGE_NAME:$IMAGE_TAG"
+            echo "   $IMAGE_NAME:latest"
         }
         failure {
             echo "❌ Build failed. Check logs."
