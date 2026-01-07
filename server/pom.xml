@@ -5,7 +5,6 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- ✅ INHERIT FROM PARENT -->
     <parent>
         <groupId>com.example.maven-project</groupId>
         <artifactId>maven-project</artifactId>
@@ -18,20 +17,20 @@
 
     <dependencies>
 
-    <!-- JUnit -->
-    <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <scope>test</scope>
-    </dependency>
+        <!-- JUnit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-    <!-- Hamcrest -->
-    <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-core</artifactId>
-        <scope>test</scope>
-    </dependency>
+        <!-- Hamcrest -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-</dependencies>
+    </dependencies>
 
 </project>
