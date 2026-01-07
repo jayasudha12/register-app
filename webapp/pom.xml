@@ -5,7 +5,6 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Inherit from parent -->
     <parent>
         <groupId>com.example.maven-project</groupId>
         <artifactId>maven-project</artifactId>
@@ -17,7 +16,6 @@
     <packaging>war</packaging>
 
     <name>Webapp</name>
-    <description>Web application module</description>
 
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -36,7 +34,6 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
             <scope>provided</scope>
         </dependency>
 
@@ -44,7 +41,6 @@
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
-            <version>2.2</version>
             <scope>provided</scope>
         </dependency>
 
