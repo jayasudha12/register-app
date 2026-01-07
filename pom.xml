@@ -11,15 +11,12 @@
     <packaging>pom</packaging>
 
     <name>Maven Project</name>
-    <description>Sample Maven multi-module project</description>
-    <url>http://www.example.com</url>
 
     <!-- ===================== -->
     <!-- Properties -->
     <!-- ===================== -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
@@ -33,12 +30,35 @@
     </modules>
 
     <!-- ===================== -->
+    <!-- Dependency Management -->
+    <!-- ===================== -->
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- ✅ FIX: hamcrest-library VERSION DEFINED HERE -->
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-library</artifactId>
+                <version>1.2.1</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.10</version>
+                <scope>test</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- ===================== -->
     <!-- Build Plugins -->
     <!-- ===================== -->
     <build>
         <plugins>
 
-            <!-- Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -49,95 +69,14 @@
                 </configuration>
             </plugin>
 
-            <!-- WAR Plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.2</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
-            </plugin>
-
-            <!-- ✅ SonarQube Maven Plugin -->
+            <!-- ✅ SonarQube Plugin -->
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
                 <version>3.11.0.3922</version>
             </plugin>
 
-            <!-- Release Plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.2.1</version>
-                <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                </configuration>
-            </plugin>
-
         </plugins>
     </build>
-
-    <!-- ===================== -->
-    <!-- Dependency Management -->
-    <!-- ===================== -->
-    <dependencyManagement>
-        <dependencies>
-
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>servlet-api</artifactId>
-                <version>2.5</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.servlet.jsp</groupId>
-                <artifactId>jsp-api</artifactId>
-                <version>2.2</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit-dep</artifactId>
-                <version>4.10</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-core</artifactId>
-                <version>1.2.1</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>1.8.5</version>
-                <scope>test</scope>
-            </dependency>
-
-        </dependencies>
-    </dependencyManagement>
-
-    <!-- ===================== -->
-    <!-- SCM -->
-    <!-- ===================== -->
-    <scm>
-        <connection>scm:git:git@github.com:jleetutorial/maven-project.git</connection>
-        <developerConnection>scm:git:git@github.com:jleetutorial/maven-project.git</developerConnection>
-        <tag>HEAD</tag>
-        <url>https://github.com/jleetutorial/maven-project</url>
-    </scm>
-
-    <!-- ===================== -->
-    <!-- Prerequisites (Legacy) -->
-    <!-- ===================== -->
-    <prerequisites>
-        <maven>3.0.3</maven>
-    </prerequisites>
 
 </project>
