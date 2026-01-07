@@ -56,20 +56,32 @@
 
     <!-- 🔥 THIS IS THE IMPORTANT PART -->
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
-                    <configuration>
-                        <source>8</source>
-                        <target>8</target>
-                    </configuration>
-               </plugin>
-            </plugins>
-        </pluginManagement>
-   </build>
+
+    <!-- Force modern compiler -->
+    <pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+
+    <!-- Execute compiler -->
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <!-- THIS is the key for Java 21 -->
+                <release>8</release>
+            </configuration>
+        </plugin>
+    </plugins>
+
+</build>
+
 
 
 </project>
