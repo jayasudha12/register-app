@@ -17,6 +17,11 @@
 
     <name>Webapp</name>
 
+    <!-- ✅ ADD THIS -->
+    <properties>
+        <maven.compiler.release>8</maven.compiler.release>
+    </properties>
+
     <build>
         <finalName>${project.artifactId}</finalName>
         <plugins>
@@ -29,21 +34,17 @@
     </build>
 
     <dependencies>
-
-        <!-- Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
-        <!-- JSP API -->
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
 </project>
