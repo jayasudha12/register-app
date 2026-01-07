@@ -55,11 +55,11 @@
     </dependencyManagement>
 
     <!-- 🔥 THIS IS THE IMPORTANT PART -->
-   <build>
+  <build>
+
+    <!-- Force plugin versions for all modules -->
     <pluginManagement>
         <plugins>
-
-            <!-- FORCE compiler plugin version -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -68,10 +68,19 @@
                     <release>8</release>
                 </configuration>
             </plugin>
-
         </plugins>
     </pluginManagement>
+
+    <!-- Actually APPLY the plugin -->
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+        </plugin>
+    </plugins>
+
 </build>
+
 
 
 
