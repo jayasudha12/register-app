@@ -1,6 +1,8 @@
 pipeline {
 
-    agent { label 'jenkins-Agent' }
+    agent { 
+        label 'jenkins-Agent' 
+    }
 
     tools {
         jdk 'java17'
@@ -39,23 +41,50 @@ pipeline {
 
         stage("SonarQube Analysis") {
             steps {
-                    script {
-                         withSonarQubeEnv(credentialsId:  'jenkins-sonarqube-token') {
-                         sh "mvn sonar:sonar"
-                         }
-                   }
-             }
+                script {
+                    withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
+                        sh "mvn sonar:sonar"
+                    }
+                }
+            }
         }
 
         stage("Quality Gate") {
             steps {
                 script {
-                       waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
-                 }
+                    waitForQualityGate abortPipeline: false,
+                        credentialsId: 'jenkins-sonarqube-token'
+                }
             }
         }
 
-        stage("Docker Build & Push") {
+        stage("Docker Build") {
+            steps {
+                sh '''
+                    docker build -t $IMAGE_NAME:$IMAGE_TAG .
+                    docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+                '''
+            }
+        }
+
+        stage("Trivy Scan") {
+            steps {
+                script {
+                    sh '''
+                        docker run --rm \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        aquasec/trivy image $IMAGE_NAME:latest \
+                        --no-progress \
+                        --scanners vuln \
+                        --exit-code 0 \
+                        --severity HIGH,CRITICAL \
+                        --format table
+                    '''
+                }
+            }
+        }
+
+        stage("Docker Push") {
             steps {
                 withCredentials([
                     usernamePassword(
@@ -66,8 +95,7 @@ pipeline {
                 ]) {
                     sh '''
                         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-                        docker build -t $IMAGE_NAME:$IMAGE_TAG .
-                        docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+
                         docker push $IMAGE_NAME:$IMAGE_TAG
                         docker push $IMAGE_NAME:latest
                     '''
@@ -83,9 +111,11 @@ pipeline {
             echo "   $IMAGE_NAME:$IMAGE_TAG"
             echo "   $IMAGE_NAME:latest"
         }
+
         failure {
             echo "❌ Build failed. Check logs."
         }
+
         always {
             cleanWs()
         }
