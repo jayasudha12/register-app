@@ -1,8 +1,6 @@
 pipeline {
 
-    agent { 
-        label 'jenkins-Agent' 
-    }
+    agent { label 'jenkins-Agent' }
 
     tools {
         jdk 'java17'
@@ -58,33 +56,7 @@ pipeline {
             }
         }
 
-        stage("Docker Build") {
-            steps {
-                sh '''
-                    docker build -t $IMAGE_NAME:$IMAGE_TAG .
-                    docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
-                '''
-            }
-        }
-
-        stage("Trivy Scan") {
-            steps {
-                script {
-                    sh '''
-                        docker run --rm \
-                        -v /var/run/docker.sock:/var/run/docker.sock \
-                        aquasec/trivy image $IMAGE_NAME:latest \
-                        --no-progress \
-                        --scanners vuln \
-                        --exit-code 0 \
-                        --severity HIGH,CRITICAL \
-                        --format table
-                    '''
-                }
-            }
-        }
-
-        stage("Docker Push") {
+        stage("Docker Build & Push") {
             steps {
                 withCredentials([
                     usernamePassword(
@@ -96,9 +68,38 @@ pipeline {
                     sh '''
                         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
+                        docker build -t $IMAGE_NAME:$IMAGE_TAG .
+                        docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+
                         docker push $IMAGE_NAME:$IMAGE_TAG
                         docker push $IMAGE_NAME:latest
                     '''
+                }
+            }
+        }
+
+        stage("Trivy Scan") {
+            steps {
+                script {
+                    sh """
+                        docker run --rm \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        aquasec/trivy image ${IMAGE_NAME}:latest \
+                        --no-progress \
+                        --scanners vuln \
+                        --exit-code 0 \
+                        --severity HIGH,CRITICAL \
+                        --format table
+                    """
+                }
+            }
+        }
+
+        stage("Cleanup Artifacts") {
+            steps {
+                script {
+                    sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
+                    sh "docker rmi ${IMAGE_NAME}:latest || true"
                 }
             }
         }
@@ -108,8 +109,8 @@ pipeline {
         success {
             echo "✅ Build successful!"
             echo "🐳 Docker Image pushed:"
-            echo "   $IMAGE_NAME:$IMAGE_TAG"
-            echo "   $IMAGE_NAME:latest"
+            echo "   ${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "   ${IMAGE_NAME}:latest"
         }
 
         failure {
