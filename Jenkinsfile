@@ -13,6 +13,7 @@ pipeline {
         DOCKER_USER = "puvisha007"
         IMAGE_NAME  = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG   = "${RELEASE}-${BUILD_NUMBER}"
+        JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
     }
 
     stages {
@@ -103,18 +104,50 @@ pipeline {
                 }
             }
         }
-    }
+
+        stage("Trigger CD Pipeline") {
+            steps {
+                script {
+                    withCredentials([
+                        string(credentialsId: 'jenkins-api-token', variable: 'JENKINS_API_TOKEN')
+                    ]) {
+                        sh """
+                            curl -v -k \
+                            --user clouduser:${JENKINS_API_TOKEN} \
+                            -X POST \
+                            -H 'cache-control: no-cache' \
+                            -H 'content-type: application/x-www-form-urlencoded' \
+                            --data 'IMAGE_TAG=${IMAGE_TAG}' \
+                            'http://ec2-13-53-36-0.eu-north-1.compute.amazonaws.com:8080/job/gitops-register-app-cd/buildWithParameters?token=gitops-token'
+                        """
+                    }
+                }
+            }
+        }
+
+    } // ✅ stages end
 
     post {
+
         success {
             echo "✅ Build successful!"
             echo "🐳 Docker Image pushed:"
             echo "   ${IMAGE_NAME}:${IMAGE_TAG}"
             echo "   ${IMAGE_NAME}:latest"
+
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                    subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful",
+                    mimeType: 'text/html',
+                    to: "puvishapa@gmail.com"
         }
 
         failure {
             echo "❌ Build failed. Check logs."
+
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                    subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed",
+                    mimeType: 'text/html',
+                    to: "puvishapa@gmail.com"
         }
 
         always {
