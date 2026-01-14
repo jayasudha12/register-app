@@ -109,7 +109,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        string(credentialsId: 'jenkins-api-token', variable: 'JENKINS_API_TOKEN')
+                        string(credentialsId: 'JENKINS_API_TOKEN', variable: 'JENKINS_API_TOKEN')
                     ]) {
                         sh """
                             curl -v -k \
