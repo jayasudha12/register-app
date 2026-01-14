@@ -113,7 +113,7 @@ pipeline {
                     ]) {
                         sh """
                             curl -v -k \
-                            --user clouduser:${JENKINS_API_TOKEN} \
+                            --user Puvisha:${JENKINS_API_TOKEN} \
                             -X POST \
                             -H 'cache-control: no-cache' \
                             -H 'content-type: application/x-www-form-urlencoded' \
